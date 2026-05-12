@@ -28,6 +28,7 @@ jobs:
       - name: Determine Version
         run: |
           VERSION=$(git describe --tags)
+          TAG_NAME=$(git tag --points-at HEAD)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
@@ -62,6 +63,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v3 # v2
         with:
+          tag_name: $TAG_NAME
+          generate_release_notes: true
           files: |
             new-api
             checksums-linux.txt
