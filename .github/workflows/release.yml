@@ -60,8 +60,7 @@ jobs:
         run: sha256sum new-api > checksums-linux.txt
 
       - name: Release
-        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2
-        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v3 # v2
         with:
           files: |
             new-api
