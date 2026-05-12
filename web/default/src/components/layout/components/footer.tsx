@@ -40,12 +40,6 @@ interface FooterProps {
   className?: string
 }
 
-const NEW_API_FOOTER_ATTRIBUTION_KEY = [
-  'footer',
-  'new' + 'api',
-  'projectAttributionSuffix',
-].join('.')
-
 function FooterLinkItem(props: { link: FooterLink }) {
   const { t } = useTranslation()
   const isExternal = props.link.href.startsWith('http')
@@ -75,13 +69,11 @@ function FooterLinkItem(props: { link: FooterLink }) {
 }
 
 function ProjectAttribution(props: { currentYear: number }) {
-  const { t } = useTranslation()
 
   return (
     <div className='text-muted-foreground/45 text-center text-xs sm:text-right'>
       <span className='text-muted-foreground/45'>
-        &copy; {props.currentYear}{' '}
-        . {t(NEW_API_FOOTER_ATTRIBUTION_KEY)}
+        &copy; {props.currentYear}{' '} Polaris Cloud Platform
       </span>
     </div>
   )
