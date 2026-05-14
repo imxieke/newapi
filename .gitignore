@@ -13,6 +13,7 @@ web/classic/dist
 web/node_modules
 web/dist
 .env
+aiapi
 one-api
 new-api
 /__debug_bin*
@@ -25,7 +26,6 @@ tiktoken_cache
 plans
 .claude
 .cursor
-bun.lock
 electron/node_modules
 electron/dist
 data/
