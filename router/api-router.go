@@ -58,6 +58,14 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.POST("/waffo/webhook", controller.WaffoWebhook)
 		//apiRouter.POST("/waffo-pancake/webhook", controller.WaffoPancakeWebhook)
 
+		// 微信支付V3回调（无需认证）
+		apiRouter.POST("/wechat-pay/notify", controller.WeChatPayNotify)
+		// 支付宝V3回调（无需认证）
+		apiRouter.POST("/alipay/notify", controller.AlipayNotify)
+		apiRouter.GET("/alipay/notify", controller.AlipayNotify)
+		apiRouter.GET("/alipay/return", controller.AlipayReturn)
+		apiRouter.POST("/alipay/return", controller.AlipayReturn)
+
 		// Universal secure verification routes
 		apiRouter.POST("/verify", middleware.UserAuth(), middleware.CriticalRateLimit(), controller.UniversalVerify)
 
@@ -102,6 +110,13 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.POST("/waffo/pay", middleware.CriticalRateLimit(), controller.RequestWaffoPay)
 				//selfRoute.POST("/waffo-pancake/amount", controller.RequestWaffoPancakeAmount)
 				//selfRoute.POST("/waffo-pancake/pay", middleware.CriticalRateLimit(), controller.RequestWaffoPancakePay)
+				// 微信支付V3
+				selfRoute.POST("/wechat-pay/pay", middleware.CriticalRateLimit(), controller.RequestWeChatPay)
+				selfRoute.POST("/wechat-pay/amount", controller.RequestWeChatPayAmount)
+				selfRoute.GET("/wechat-pay/order-status", controller.WeChatPayOrderStatus)
+				// 支付宝V3
+				selfRoute.POST("/alipay/pay", middleware.CriticalRateLimit(), controller.RequestAlipay)
+				selfRoute.POST("/alipay/amount", controller.RequestAlipayAmount)
 				selfRoute.POST("/aff_transfer", controller.TransferAffQuota)
 				selfRoute.PUT("/setting", controller.UpdateUserSetting)
 
@@ -154,6 +169,8 @@ func SetApiRouter(router *gin.Engine) {
 			subscriptionRoute.POST("/epay/pay", middleware.CriticalRateLimit(), controller.SubscriptionRequestEpay)
 			subscriptionRoute.POST("/stripe/pay", middleware.CriticalRateLimit(), controller.SubscriptionRequestStripePay)
 			subscriptionRoute.POST("/creem/pay", middleware.CriticalRateLimit(), controller.SubscriptionRequestCreemPay)
+			subscriptionRoute.POST("/wechat-pay/pay", middleware.CriticalRateLimit(), controller.SubscriptionRequestWeChatPay)
+			subscriptionRoute.POST("/alipay/pay", middleware.CriticalRateLimit(), controller.SubscriptionRequestAlipay)
 		}
 		subscriptionAdminRoute := apiRouter.Group("/subscription/admin")
 		subscriptionAdminRoute.Use(middleware.AdminAuth())
@@ -176,6 +193,13 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/subscription/epay/notify", controller.SubscriptionEpayNotify)
 		apiRouter.GET("/subscription/epay/return", controller.SubscriptionEpayReturn)
 		apiRouter.POST("/subscription/epay/return", controller.SubscriptionEpayReturn)
+		// 微信支付V3订阅回调
+		apiRouter.POST("/subscription/wechat-pay/notify", controller.SubscriptionWeChatPayNotify)
+		// 支付宝V3订阅回调
+		apiRouter.POST("/subscription/alipay/notify", controller.SubscriptionAlipayNotify)
+		apiRouter.GET("/subscription/alipay/notify", controller.SubscriptionAlipayNotify)
+		apiRouter.GET("/subscription/alipay/return", controller.SubscriptionAlipayReturn)
+		apiRouter.POST("/subscription/alipay/return", controller.SubscriptionAlipayReturn)
 		optionRoute := apiRouter.Group("/option")
 		optionRoute.Use(middleware.RootAuth())
 		{

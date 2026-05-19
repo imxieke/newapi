@@ -338,9 +338,9 @@ const RechargeCard = ({
                                   paymentLoading && payWay === payMethod.type
                                 }
                                 icon={
-                                  payMethod.type === 'alipay' ? (
+                                  payMethod.type === 'alipay' || payMethod.type === 'alipay_native' ? (
                                     <SiAlipay size={18} color='#1677FF' />
-                                  ) : payMethod.type === 'wxpay' ? (
+                                  ) : payMethod.type === 'wxpay' || payMethod.type === 'wxpay_native' ? (
                                     <SiWechat size={18} color='#07C160' />
                                   ) : payMethod.type === 'stripe' ? (
                                     <SiStripe size={18} color='#635BFF' />

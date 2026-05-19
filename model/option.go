@@ -118,6 +118,23 @@ func InitOptionMap() {
 	common.OptionMap["WaffoPancakeCurrency"] = setting.WaffoPancakeCurrency
 	common.OptionMap["WaffoPancakeUnitPrice"] = strconv.FormatFloat(setting.WaffoPancakeUnitPrice, 'f', -1, 64)
 	common.OptionMap["WaffoPancakeMinTopUp"] = strconv.Itoa(setting.WaffoPancakeMinTopUp)
+	// 微信支付V3
+	common.OptionMap["WeChatPayEnabled"] = strconv.FormatBool(setting.WeChatPayEnabled)
+	common.OptionMap["WeChatPayMchID"] = setting.WeChatPayMchID
+	common.OptionMap["WeChatPayAppID"] = setting.WeChatPayAppID
+	common.OptionMap["WeChatPayMchSerial"] = setting.WeChatPayMchSerial
+	common.OptionMap["WeChatPayAPIv3Key"] = setting.WeChatPayAPIv3Key
+	common.OptionMap["WeChatPayPrivateKey"] = setting.WeChatPayPrivateKey
+	common.OptionMap["WeChatPayNotifyURL"] = setting.WeChatPayNotifyURL
+	common.OptionMap["WeChatPayMinTopUp"] = strconv.Itoa(setting.WeChatPayMinTopUp)
+	// 支付宝V3
+	common.OptionMap["AlipayEnabled"] = strconv.FormatBool(setting.AlipayEnabled)
+	common.OptionMap["AlipayAppID"] = setting.AlipayAppID
+	common.OptionMap["AlipayPrivateKey"] = setting.AlipayPrivateKey
+	common.OptionMap["AlipayAlipayPublicKey"] = setting.AlipayAlipayPublicKey
+	common.OptionMap["AlipayNotifyURL"] = setting.AlipayNotifyURL
+	common.OptionMap["AlipayMinTopUp"] = strconv.Itoa(setting.AlipayMinTopUp)
+	common.OptionMap["AlipaySandbox"] = strconv.FormatBool(setting.AlipaySandbox)
 	common.OptionMap["TopupGroupRatio"] = common.TopupGroupRatio2JSONString()
 	common.OptionMap["Chats"] = setting.Chats2JsonString()
 	common.OptionMap["AutoGroups"] = setting.AutoGroups2JsonString()
@@ -443,6 +460,38 @@ func updateOptionMap(key string, value string) (err error) {
 		setting.WaffoPancakeUnitPrice, _ = strconv.ParseFloat(value, 64)
 	case "WaffoPancakeMinTopUp":
 		setting.WaffoPancakeMinTopUp, _ = strconv.Atoi(value)
+	// 微信支付V3
+	case "WeChatPayEnabled":
+		setting.WeChatPayEnabled = value == "true"
+	case "WeChatPayMchID":
+		setting.WeChatPayMchID = value
+	case "WeChatPayAppID":
+		setting.WeChatPayAppID = value
+	case "WeChatPayMchSerial":
+		setting.WeChatPayMchSerial = value
+	case "WeChatPayAPIv3Key":
+		setting.WeChatPayAPIv3Key = value
+	case "WeChatPayPrivateKey":
+		setting.WeChatPayPrivateKey = value
+	case "WeChatPayNotifyURL":
+		setting.WeChatPayNotifyURL = value
+	case "WeChatPayMinTopUp":
+		setting.WeChatPayMinTopUp, _ = strconv.Atoi(value)
+	// 支付宝V3
+	case "AlipayEnabled":
+		setting.AlipayEnabled = value == "true"
+	case "AlipayAppID":
+		setting.AlipayAppID = value
+	case "AlipayPrivateKey":
+		setting.AlipayPrivateKey = value
+	case "AlipayAlipayPublicKey":
+		setting.AlipayAlipayPublicKey = value
+	case "AlipayNotifyURL":
+		setting.AlipayNotifyURL = value
+	case "AlipayMinTopUp":
+		setting.AlipayMinTopUp, _ = strconv.Atoi(value)
+	case "AlipaySandbox":
+		setting.AlipaySandbox = value == "true"
 	case "TopupGroupRatio":
 		err = common.UpdateTopupGroupRatioByJSONString(value)
 	case "GitHubClientId":

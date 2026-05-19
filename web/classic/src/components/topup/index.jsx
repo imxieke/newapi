@@ -138,6 +138,12 @@ const TopUp = () => {
     if (payment === 'stripe') {
       return getStripeAmount(value);
     }
+    if (payment === 'wxpay_native') {
+      return getWeChatPayAmount(value);
+    }
+    if (payment === 'alipay_native') {
+      return getAlipayAmount(value);
+    }
     if (payment === 'waffo_pancake') {
       return getWaffoPancakeAmount(value);
     }
@@ -261,6 +267,16 @@ const TopUp = () => {
       if (amount === 0) {
         await getStripeAmount();
       }
+    } else if (payWay === 'wxpay_native') {
+      // 微信支付V3
+      if (amount === 0) {
+        await getWeChatPayAmount();
+      }
+    } else if (payWay === 'alipay_native') {
+      // 支付宝V3
+      if (amount === 0) {
+        await getAlipayAmount();
+      }
     } else {
       // 普通支付处理
       if (amount === 0) {
@@ -281,6 +297,21 @@ const TopUp = () => {
           amount: parseInt(topUpCount),
           payment_method: 'stripe',
         });
+      } else if (payWay === 'wxpay_native') {
+        // 微信支付V3请求
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        res = await API.post('/api/user/wechat-pay/pay', {
+          amount: parseInt(topUpCount),
+          scene: isMobile ? 'h5' : 'native',
+          client_ip: '',
+        });
+      } else if (payWay === 'alipay_native') {
+        // 支付宝V3请求
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        res = await API.post('/api/user/alipay/pay', {
+          amount: parseInt(topUpCount),
+          scene: isMobile ? 'wap' : 'page',
+        });
       } else {
         // 普通支付请求
         res = await API.post('/api/user/pay', {
@@ -295,6 +326,29 @@ const TopUp = () => {
           if (payWay === 'stripe') {
             // Stripe 支付回调处理
             window.open(data.pay_link, '_blank');
+          } else if (payWay === 'wxpay_native') {
+            // 微信支付V3回调处理
+            if (data.type === 'native' && data.code_url) {
+              // Native扫码支付 - 显示二维码
+              showWeChatQRCode(data.code_url, data.trade_no);
+            } else if (data.type === 'h5' && data.h5_url) {
+              // H5支付 - 跳转
+              window.location.href = data.h5_url;
+            } else if (data.type === 'jsapi' && data.jsapi_params) {
+              // JSAPI支付 - 调用微信JSAPI
+              if (window.WeixinJSBridge) {
+                window.WeixinJSBridge.invoke('getBrandWCPayRequest', data.jsapi_params, function(res) {
+                  if (res.err_msg === 'get_brand_wcpay_request:ok') {
+                    showSuccess(t('支付成功'));
+                  }
+                });
+              }
+            }
+          } else if (payWay === 'alipay_native') {
+            // 支付宝V3回调处理
+            if (data.pay_url) {
+              window.location.href = data.pay_url;
+            }
           } else {
             // 普通支付表单提交
             let params = data;
@@ -834,6 +888,86 @@ const TopUp = () => {
     } finally {
       setAmountLoading(false);
     }
+  };
+
+  const getWeChatPayAmount = async (value) => {
+    if (value === undefined) {
+      value = topUpCount;
+    }
+    setAmountLoading(true);
+    try {
+      const res = await API.post('/api/user/wechat-pay/amount', {
+        amount: parseFloat(value),
+      });
+      if (res !== undefined) {
+        const { message, data } = res.data;
+        if (message === 'success') {
+          setAmount(parseFloat(data));
+        } else {
+          setAmount(0);
+          Toast.error({ content: '错误：' + data, id: 'getAmount' });
+        }
+      } else {
+        showError(res);
+      }
+    } catch (err) {
+      // amount fetch failed silently
+    } finally {
+      setAmountLoading(false);
+    }
+  };
+
+  const getAlipayAmount = async (value) => {
+    if (value === undefined) {
+      value = topUpCount;
+    }
+    setAmountLoading(true);
+    try {
+      const res = await API.post('/api/user/alipay/amount', {
+        amount: parseFloat(value),
+      });
+      if (res !== undefined) {
+        const { message, data } = res.data;
+        if (message === 'success') {
+          setAmount(parseFloat(data));
+        } else {
+          setAmount(0);
+          Toast.error({ content: '错误：' + data, id: 'getAmount' });
+        }
+      } else {
+        showError(res);
+      }
+    } catch (err) {
+      // amount fetch failed silently
+    } finally {
+      setAmountLoading(false);
+    }
+  };
+
+  // 微信支付扫码弹窗
+  const [wechatQROpen, setWechatQROpen] = useState(false);
+  const [wechatQRUrl, setWechatQRUrl] = useState('');
+  const [wechatTradeNo, setWechatTradeNo] = useState('');
+
+  const showWeChatQRCode = (codeUrl, tradeNo) => {
+    setWechatQRUrl(codeUrl);
+    setWechatTradeNo(tradeNo);
+    setWechatQROpen(true);
+    // 轮询订单状态
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await API.get(`/api/user/wechat-pay/order-status?trade_no=${tradeNo}`);
+        if (res?.data?.data?.status === 'success') {
+          clearInterval(pollInterval);
+          setWechatQROpen(false);
+          showSuccess(t('支付成功'));
+        }
+      } catch (e) {
+        // ignore
+      }
+    }, 3000);
+    // 5分钟后停止轮询
+    setTimeout(() => clearInterval(pollInterval), 300000);
   };
 
   const handleCancel = () => {

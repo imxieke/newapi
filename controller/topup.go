@@ -75,6 +75,45 @@ func GetTopUpInfo(c *gin.Context) {
 	}
 
 	enableWaffoPancake := isWaffoPancakeTopUpEnabled()
+	enableWeChatPay := isWeChatPayTopUpEnabled()
+	enableAlipay := isAlipayTopUpEnabled()
+
+	if enableWeChatPay {
+		hasWeChatPay := false
+		for _, method := range payMethods {
+			if method["type"] == model.PaymentMethodWeChatPay {
+				hasWeChatPay = true
+				break
+			}
+		}
+		if !hasWeChatPay {
+			payMethods = append(payMethods, map[string]string{
+				"name":      "微信支付",
+				"type":      model.PaymentMethodWeChatPay,
+				"color":     "rgba(var(--semi-green-5), 1)",
+				"min_topup": strconv.Itoa(setting.WeChatPayMinTopUp),
+			})
+		}
+	}
+
+	if enableAlipay {
+		hasAlipay := false
+		for _, method := range payMethods {
+			if method["type"] == model.PaymentMethodAlipay {
+				hasAlipay = true
+				break
+			}
+		}
+		if !hasAlipay {
+			payMethods = append(payMethods, map[string]string{
+				"name":      "支付宝",
+				"type":      model.PaymentMethodAlipay,
+				"color":     "rgba(var(--semi-blue-5), 1)",
+				"min_topup": strconv.Itoa(setting.AlipayMinTopUp),
+			})
+		}
+	}
+
 	if enableWaffoPancake {
 		hasWaffoPancake := false
 		for _, method := range payMethods {
@@ -100,6 +139,8 @@ func GetTopUpInfo(c *gin.Context) {
 		"enable_creem_topup":               isCreemTopUpEnabled(),
 		"enable_waffo_topup":               enableWaffo,
 		"enable_waffo_pancake_topup":       enableWaffoPancake,
+		"enable_wechat_pay_topup":          enableWeChatPay,
+		"enable_alipay_topup":              enableAlipay,
 		"enable_redemption":                complianceConfirmed,
 		"payment_compliance_confirmed":     complianceConfirmed,
 		"payment_compliance_terms_version": operation_setting.CurrentComplianceTermsVersion,
@@ -115,6 +156,8 @@ func GetTopUpInfo(c *gin.Context) {
 		"stripe_min_topup":        setting.StripeMinTopUp,
 		"waffo_min_topup":         setting.WaffoMinTopUp,
 		"waffo_pancake_min_topup": setting.WaffoPancakeMinTopUp,
+		"wechat_pay_min_topup":   setting.WeChatPayMinTopUp,
+		"alipay_min_topup":       setting.AlipayMinTopUp,
 		"amount_options":          operation_setting.GetPaymentSetting().AmountOptions,
 		"discount":                operation_setting.GetPaymentSetting().AmountDiscount,
 		"topup_link":              common.TopUpLink,

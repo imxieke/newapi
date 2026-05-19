@@ -25,6 +25,8 @@ import SettingsPaymentGatewayStripe from '../../pages/Setting/Payment/SettingsPa
 import SettingsPaymentGatewayCreem from '../../pages/Setting/Payment/SettingsPaymentGatewayCreem';
 import SettingsPaymentGatewayWaffo from '../../pages/Setting/Payment/SettingsPaymentGatewayWaffo';
 import SettingsPaymentGatewayWaffoPancake from '../../pages/Setting/Payment/SettingsPaymentGatewayWaffoPancake';
+import SettingsPaymentGatewayWeChatPay from '../../pages/Setting/Payment/SettingsPaymentGatewayWeChatPay';
+import SettingsPaymentGatewayAlipay from '../../pages/Setting/Payment/SettingsPaymentGatewayAlipay';
 import { API, showError, showSuccess, toBoolean } from '../../helpers';
 import { useTranslation } from 'react-i18next';
 import RiskAcknowledgementModal from '../common/modals/RiskAcknowledgementModal';
@@ -334,6 +336,20 @@ const PaymentSetting = () => {
               {/*    hideSectionTitle*/}
               {/*  />*/}
               {/*</Tabs.TabPane>*/}
+              <Tabs.TabPane tab={t('微信支付V3')} itemKey='wechat-pay'>
+                <SettingsPaymentGatewayWeChatPay
+                  options={inputs}
+                  refresh={onRefresh}
+                  hideSectionTitle
+                />
+              </Tabs.TabPane>
+              <Tabs.TabPane tab={t('支付宝V3')} itemKey='alipay'>
+                <SettingsPaymentGatewayAlipay
+                  options={inputs}
+                  refresh={onRefresh}
+                  hideSectionTitle
+                />
+              </Tabs.TabPane>
             </Tabs>
           </div>
         </Card>

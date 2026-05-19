@@ -54,6 +54,8 @@ const PAYMENT_METHOD_MAP = {
   waffo: 'Waffo',
   alipay: '支付宝',
   wxpay: '微信',
+  wxpay_native: '微信支付',
+  alipay_native: '支付宝',
 };
 
 const TopupHistoryModal = ({ visible, onCancel, t }) => {
